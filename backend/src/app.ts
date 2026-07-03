@@ -3,12 +3,11 @@ import cors from "cors";
 import morgan from "morgan";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
 import { productsRouter, vendorsRouter, purchaseOrdersRouter } from "./routes/index.js";
+import { NODE_ENV, CORS_ORIGIN } from "./conf.js";
 
 const app = express();
 
-const NODE_ENV = process.env.NODE_ENV ?? "development";
-
-app.use(cors({ origin: "*" }));
+app.use(cors({ origin: CORS_ORIGIN }));
 app.use(morgan(NODE_ENV === "production" ? "combined" : "dev"));
 app.use(express.json());
 

@@ -1,5 +1,6 @@
 import { store, type LineItem, type PurchaseOrder } from "../store/store.js";
 import { createApiError } from "../middleware/errorHandler.js";
+import { MANAGER_APPROVAL_THRESHOLD } from "../conf.js";
 
 export interface CreatePOInput {
   vendorId: unknown;
@@ -82,5 +83,61 @@ export function listPOs(): SerializedPO[] {
 export function getPO(id: number): SerializedPO {
   const po = store.purchaseOrders.get(id);
   if (!po) throw createApiError(404, `Purchase order ${id} not found`);
+  return serializePO(po);
+}
+
+
+export function approvePO(id: number, role?: string): SerializedPO {
+  const po = store.purchaseOrders.get(id);
+  if (!po) {
+    throw createApiError(404, `Purchase order ${id} not found`);
+  }
+
+  // State rule: only draft POs can be approved.
+  if (po.status !== "draft") {
+    throw createApiError(
+      409,
+      `Cannot approve purchase order ${id}: status is '${po.status}', only 'draft' POs can be approved`,
+    );
+  }
+
+  const total = computeTotal(po.lineItems);
+  if (total >= MANAGER_APPROVAL_THRESHOLD && role !== "manager") {
+    throw createApiError(
+      403,
+      `Purchase order ${id} totals ${total}, which is at or above ${MANAGER_APPROVAL_THRESHOLD} and requires manager approval (add ?role=manager)`,
+    );
+  }
+
+  // All checks passed — mutate.
+  po.status = "approved";
+  po.approvedAt = new Date().toISOString();
+
+  return serializePO(po);
+}
+
+export function receivePO(id: number): SerializedPO {
+  const po = store.purchaseOrders.get(id);
+  if (!po) {
+    throw createApiError(404, `Purchase order ${id} not found`);
+  }
+
+  // State rule: only approved POs can be received.
+  if (po.status !== "approved") {
+    throw createApiError(
+      409,
+      `Cannot receive purchase order ${id}: status is '${po.status}', only 'approved' POs can be received`,
+    );
+  }
+
+  // All checks passed — mutate.
+  for (const li of po.lineItems) {
+    const product = store.products.get(li.productId)!;
+    product.stock += li.qty;
+  }
+
+  po.status = "received";
+  po.receivedAt = new Date().toISOString();
+
   return serializePO(po);
 }

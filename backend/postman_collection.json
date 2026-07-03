@@ -1,0 +1,118 @@
+{
+  "info": {
+    "name": "SimpleGrid Backend",
+    "description": "Purchase Order + Inventory API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000/api" },
+    { "key": "poId", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "List products",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/products", "host": ["{{baseUrl}}"], "path": ["products"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Vendors",
+      "item": [
+        {
+          "name": "List vendors",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/vendors", "host": ["{{baseUrl}}"], "path": ["vendors"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Purchase Orders",
+      "item": [
+        {
+          "name": "List purchase orders",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/purchase-orders", "host": ["{{baseUrl}}"], "path": ["purchase-orders"] }
+          }
+        },
+        {
+          "name": "Get purchase order by id",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/purchase-orders/{{poId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["purchase-orders", "{{poId}}"]
+            }
+          }
+        },
+        {
+          "name": "Create purchase order",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vendorId\": 1,\n  \"lineItems\": [\n    { \"productId\": 1, \"qty\": 2, \"unitPrice\": 50 }\n  ]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/purchase-orders", "host": ["{{baseUrl}}"], "path": ["purchase-orders"] }
+          }
+        },
+        {
+          "name": "Create purchase order (>= manager threshold)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vendorId\": 1,\n  \"lineItems\": [\n    { \"productId\": 1, \"qty\": 1000, \"unitPrice\": 100 }\n  ]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/purchase-orders", "host": ["{{baseUrl}}"], "path": ["purchase-orders"] }
+          }
+        },
+        {
+          "name": "Approve purchase order",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/purchase-orders/{{poId}}/approve",
+              "host": ["{{baseUrl}}"],
+              "path": ["purchase-orders", "{{poId}}", "approve"]
+            }
+          }
+        },
+        {
+          "name": "Approve purchase order as manager",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/purchase-orders/{{poId}}/approve?role=manager",
+              "host": ["{{baseUrl}}"],
+              "path": ["purchase-orders", "{{poId}}", "approve"],
+              "query": [{ "key": "role", "value": "manager" }]
+            }
+          }
+        },
+        {
+          "name": "Receive purchase order",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/purchase-orders/{{poId}}/receive",
+              "host": ["{{baseUrl}}"],
+              "path": ["purchase-orders", "{{poId}}", "receive"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
