@@ -2,7 +2,13 @@ import express from "express";
 import cors from "cors";
 import morgan from "morgan";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
-import { productsRouter, vendorsRouter, purchaseOrdersRouter, devRouter } from "./routes/index.js";
+import {
+  productsRouter,
+  vendorsRouter,
+  purchaseOrdersRouter,
+  devRouter,
+  configRouter,
+} from "./routes/index.js";
 import { NODE_ENV, CORS_ORIGIN } from "./conf.js";
 
 const app = express();
@@ -15,6 +21,7 @@ app.use("/api/products", productsRouter);
 app.use("/api/vendors", vendorsRouter);
 app.use("/api/purchase-orders", purchaseOrdersRouter);
 app.use("/api/dev", devRouter);
+app.use("/api/config", configRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

@@ -1,6 +1,5 @@
 import { store, type LineItem, type PurchaseOrder } from "../store/store.js";
 import { createApiError } from "../middleware/errorHandler.js";
-import { MANAGER_APPROVAL_THRESHOLD } from "../conf.js";
 
 export interface CreatePOInput {
   vendorId: unknown;
@@ -102,10 +101,11 @@ export function approvePO(id: number, role?: string): SerializedPO {
   }
 
   const total = computeTotal(po.lineItems);
-  if (total >= MANAGER_APPROVAL_THRESHOLD && role !== "manager") {
+  const threshold = store.getManagerApprovalThreshold();
+  if (total >= threshold && role !== "manager") {
     throw createApiError(
       403,
-      `Purchase order ${id} totals ${total}, which is at or above ${MANAGER_APPROVAL_THRESHOLD} and requires manager approval (add ?role=manager)`,
+      `Purchase order ${id} totals ${total}, which is at or above ${threshold} and requires manager approval (add ?role=manager)`,
     );
   }
 
