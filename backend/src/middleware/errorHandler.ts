@@ -14,10 +14,6 @@ export function isApiError(err: unknown): err is ApiError {
   return err instanceof Error && typeof (err as ApiError).statusCode === "number";
 }
 
-export function notFoundHandler(req: Request, res: Response) {
-  res.status(404).json({ error: `Route ${req.method} ${req.originalUrl} not found` });
-}
-
 export function errorHandler(
   err: unknown,
   req: Request,
