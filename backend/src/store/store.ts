@@ -1,5 +1,3 @@
-import { MANAGER_APPROVAL_THRESHOLD } from "../conf.js";
-
 export type POStatus = "draft" | "approved" | "received";
 
 export interface Product {
@@ -51,10 +49,6 @@ const purchaseOrders = new Map<number, PurchaseOrder>();
 
 let nextPoId = 1;
 
-// Runtime-configurable — starts at the conf.ts default but can be changed
-// via the /api/config endpoint without restarting the server.
-let managerApprovalThreshold = MANAGER_APPROVAL_THRESHOLD;
-
 // Clones seed rows so mutations (e.g. stock updates on receive) never leak
 // back into the seed arrays across a resetStore() call.
 function seed(): void {
@@ -66,7 +60,6 @@ function seed(): void {
 
   purchaseOrders.clear();
   nextPoId = 1;
-  managerApprovalThreshold = MANAGER_APPROVAL_THRESHOLD;
 }
 
 seed();
@@ -80,8 +73,4 @@ export const store = {
   vendors,
   purchaseOrders,
   nextPoId: (): number => nextPoId++,
-  getManagerApprovalThreshold: (): number => managerApprovalThreshold,
-  setManagerApprovalThreshold: (value: number): void => {
-    managerApprovalThreshold = value;
-  },
 };

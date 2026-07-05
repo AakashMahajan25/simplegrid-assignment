@@ -1,5 +1,6 @@
 # Logs
 NOTES.txt
+.hallmark/
 logs
 *.log
 npm-debug.log*

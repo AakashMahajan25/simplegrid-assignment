@@ -1,122 +1,81 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState } from "react";
+import { NavLink, Route, Routes } from "react-router-dom";
+import InventoryPage from "./pages/InventoryPage";
+import PurchaseOrdersPage from "./pages/PurchaseOrdersPage";
+import ErrorBanner from "./components/ErrorBanner";
+import { resetDb } from "./api/client";
 
-function App() {
-  const [count, setCount] = useState(0)
+const navLinkClass = ({ isActive }: { isActive: boolean }) =>
+  `border-b-2 px-1 py-4 text-sm font-medium transition-colors ${
+    isActive
+      ? "border-indigo-600 text-gray-900"
+      : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+  }`;
+
+export default function App() {
+  const [resetting, setResetting] = useState(false);
+  const [resetError, setResetError] = useState<string | null>(null);
+
+  async function handleReset() {
+    if (!window.confirm("Reset all purchase orders and stock to the initial demo data?")) {
+      return;
+    }
+    setResetError(null);
+    setResetting(true);
+    try {
+      await resetDb();
+      window.location.reload();
+    } catch (err) {
+      setResetError(err instanceof Error ? err.message : "Failed to reset demo data");
+      setResetting(false);
+    }
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="min-h-screen bg-gray-50">
+      <header className="sticky top-0 z-10 border-b border-gray-200 bg-white/95 backdrop-blur">
+        <div className="mx-auto flex max-w-5xl items-center justify-between px-6">
+          <div className="flex items-center gap-8">
+            <div className="flex items-center gap-2 py-4">
+              <span className="flex h-7 w-7 items-center justify-center rounded-md bg-indigo-600 text-sm font-bold text-white">
+                SG
+              </span>
+              <div>
+                <p className="text-sm font-semibold leading-tight text-gray-900">SimpleGrid</p>
+                <p className="text-xs leading-tight text-gray-500">Procurement console</p>
+              </div>
+            </div>
+            <nav className="flex gap-6">
+              <NavLink to="/" end className={navLinkClass}>
+                Inventory
+              </NavLink>
+              <NavLink to="/purchase-orders" className={navLinkClass}>
+                Purchase orders
+              </NavLink>
+            </nav>
+          </div>
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+          <button
+            type="button"
+            onClick={handleReset}
+            disabled={resetting}
+            className="inline-flex items-center gap-1.5 rounded-md border border-red-200 bg-white px-3.5 py-1.5 text-sm font-medium text-red-600 shadow-sm transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {resetting && (
+              <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-red-300 border-t-red-600" />
+            )}
+            {resetting ? "Resetting…" : "Reset demo data"}
+          </button>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      </header>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      <main className="mx-auto max-w-5xl space-y-4 px-6 py-8">
+        {resetError && <ErrorBanner message={resetError} onDismiss={() => setResetError(null)} />}
+        <Routes>
+          <Route path="/" element={<InventoryPage />} />
+          <Route path="/purchase-orders" element={<PurchaseOrdersPage />} />
+        </Routes>
+      </main>
+    </div>
+  );
 }
-
-export default App
