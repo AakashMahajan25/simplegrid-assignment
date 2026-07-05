@@ -113,6 +113,18 @@
           }
         }
       ]
+    },
+    {
+      "name": "Dev",
+      "item": [
+        {
+          "name": "Reset demo data",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/dev/reset", "host": ["{{baseUrl}}"], "path": ["dev", "reset"] }
+          }
+        }
+      ]
     }
   ]
 }
